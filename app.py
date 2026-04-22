@@ -3,6 +3,17 @@
 基于百度飞桨 FastSpeech2 + 可选声码器
 功能：中文文本合成、音色选择、声码器选择、语速调节、合成历史记录（文件持久化，支持单条删除）
 """
+import sys
+# 伪造导入路径以兼容旧版 PaddleSpeech 调用
+try:
+    import aistudio_sdk
+    if not hasattr(aistudio_sdk.hub, 'download'):
+        # 尝试从新位置寻找并映射
+        from aistudio_sdk import common
+        aistudio_sdk.hub.download = common.download
+except Exception:
+    pass
+
 import streamlit as st
 import librosa
 import soundfile as sf
