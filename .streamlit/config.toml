@@ -1,0 +1,5 @@
+[server]
+pythonVersion = "3.10"
+
+[runner]
+magicEnabled = true
