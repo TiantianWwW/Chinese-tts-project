@@ -1,0 +1,31 @@
+# Python_pycache__/.py[cod]*$py.class
+
+# Virtual environment
+venv/
+
+# Output files
+outputs/
+*.wav
+
+# History file
+tts_history.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+
+# Build files
+build/
+dist/
+*.egg-info/
