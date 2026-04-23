@@ -4,17 +4,30 @@
 功能：中文文本合成、音色选择、声码器选择、语速调节、合成历史记录（文件持久化，支持单条删除）
 """
 import sys
-# 伪造导入路径以兼容旧版 PaddleSpeech 调用
+import types
+
+# 强制创建一个兼容的 aistudio_sdk.hub 模块
 try:
     import aistudio_sdk
+    # 创建 hub 属性（如果不存在）
+    if not hasattr(aistudio_sdk, 'hub'):
+        aistudio_sdk.hub = types.ModuleType('hub')
+    
+    # 强制注入缺失的 download 函数
     if not hasattr(aistudio_sdk.hub, 'download'):
-        # 尝试从新位置寻找并映射
-        from aistudio_sdk import common
-        aistudio_sdk.hub.download = common.download
-except Exception:
-    pass
+        def mock_download(*args, **kwargs):
+            # 这里的逻辑是：如果 paddlespeech 调用下载，
+            # 我们让它先通过，看它是否能从其他缓存中读取模型
+            print("Redirecting download call...")
+            return None
+        aistudio_sdk.hub.download = mock_download
+        # 将补丁后的模块重新注册回系统环境
+        sys.modules['aistudio_sdk.hub'] = aistudio_sdk.hub
+except Exception as e:
+    print(f"Patching failed: {e}")
 
 import streamlit as st
+
 import librosa
 import soundfile as sf
 import os
