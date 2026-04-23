@@ -3,28 +3,18 @@
 基于百度飞桨 FastSpeech2 + 可选声码器
 功能：中文文本合成、音色选择、声码器选择、语速调节、合成历史记录（文件持久化，支持单条删除）
 """
+import subprocess
 import sys
-import types
 
-# 强制创建一个兼容的 aistudio_sdk.hub 模块
-try:
-    import aistudio_sdk
-    # 创建 hub 属性（如果不存在）
-    if not hasattr(aistudio_sdk, 'hub'):
-        aistudio_sdk.hub = types.ModuleType('hub')
-    
-    # 强制注入缺失的 download 函数
-    if not hasattr(aistudio_sdk.hub, 'download'):
-        def mock_download(*args, **kwargs):
-            # 这里的逻辑是：如果 paddlespeech 调用下载，
-            # 我们让它先通过，看它是否能从其他缓存中读取模型
-            print("Redirecting download call...")
-            return None
-        aistudio_sdk.hub.download = mock_download
-        # 将补丁后的模块重新注册回系统环境
-        sys.modules['aistudio_sdk.hub'] = aistudio_sdk.hub
-except Exception as e:
-    print(f"Patching failed: {e}")
+# 在代码运行时强制安装兼容的 SDK 版本
+def install_compat_sdk():
+    try:
+        import aistudio_sdk
+    except ImportError:
+        # 使用 pip 强制安装特定旧版本以解决导入错误
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "aistudio-sdk==0.0.1"])
+
+install_compat_sdk()
 
 import streamlit as st
 
